@@ -1,9 +1,11 @@
 # Arquivo de instalação akp.install
 
 post_install() {
-    echo "Instalação concluída com sucesso!"
-    echo "Aviso: O yay não foi instalado automaticamente."
-    echo "Para usar todos os recursos do akp, instale o yay manualmente."
-    echo "Github do projeto https://github.com/Jguer/yay"
+	echo " "
+	echo "  Instalação concluída com sucesso!"
+    	echo -e "\033[0;31m  Aviso: o yay não foi instalado automaticamente  \033[0m"
+    	echo "  Para usar todos os recursos do akp, instale o yay manualmente."
+    	echo "  Github do projeto https://github.com/Jguer/yay"
+	echo " "
 }
 
