@@ -10,7 +10,7 @@ license=('GPL3')
 depends=(pacman-contrib reflector flatpak)
 makedepends=(git)
 source=("git+$url.git")
-sha256sums=('9e8423b1397b2bd517220f60fec9768c3792c1297f0d922de28aad120af89685')
+sha256sums=('SKIP')
 install=$pkgname.install
 
 package() {
