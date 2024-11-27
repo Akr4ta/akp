@@ -1,0 +1,167 @@
+#!/bin/bash
+
+#Pacotes que precisam estar instalados: pacman-contrib reflector yay flatpak
+
+# Verificar se o comando não está vazio
+if [ -z "$1" ]; then
+    echo "Erro: Nenhum alvo selecionado."
+    exit 1
+fi
+
+# Criando lista de pacotes
+packages="${@:2}"
+
+# Traduzir o comando akp para o comando equivalente do Pacman, Yay e Flatpak
+case "$1" in
+    -U)
+        # Atualiza sistema
+        sudo pacman -Syu
+        ;;
+    -Ud)
+        # Atualizar distro (Arch, aur and flatpak repo)
+        sudo pacman -Syu && echo "" && yay -a -Syu && echo "" && flatpak update
+        ;;
+    -Um)
+	# Atualizar mirrors
+	sudo reflector --country $packages --protocol https --sort rate --save /etc/pacman.d/mirrorlist && sudo pacman -Syyu
+	;;
+    -I)
+        # Instalar pacote
+
+        # Verificar se pelo menos um pacote foi fornecido
+        if [ -z "$2" ]; then
+            echo "Erro: Forneça pelo menos um pacote para instalar."
+            exit 1
+        fi
+        
+        # Definindo comando pacman
+        pacmanCommand="sudo pacman -S"
+       
+        # Função para obter dependências opcionais do Pacman
+        get_optional_deps() {
+            package="$1"
+            pactree -so "$package" | grep "(optional)" | rev | cut -d " " -f 2- | rev | cut -c 4- | tr '─' ' ' | sed 's/^\([^:]*\):/\x1b[0;34m\1\x1b[0m:/'
+        }
+
+         # Exibir dependências opcionais
+        for pkg in "$@"; do
+            if [ "$pkg" != "-I" ]; then
+                optionalDeps=$(get_optional_deps "$pkg")
+                if [ -n "$optionalDeps" ]; then
+                    echo -e "O pacote \033[0;32m$pkg\033[0m possui as seguintes dependências opcionais:"
+                    
+                    # Adiciona " :: " ao início de cada linha
+                    echo "$optionalDeps" | sed 's/^/ ::/'
+
+                    # Perguntar ao usuário quais dependências opcionais deseja instalar
+                    echo -e "Deseja instalar alguma(s) das dependências opcionais para \033[0;32m$pkg\033[0m? (Digite os nomes separados por espaços): " 
+                    read -p "" selectedOptionalDeps
+                    echo " "
+
+                    # Adicionar os pacotes principais e as dependências opcionais selecionadas à lista de pacotes
+                    packages="$packages $pkg $selectedOptionalDeps"
+                else
+                    # Se não houver dependências opcionais, adicionar apenas o pacote principal à lista
+                    packages="$packages $pkg"
+                fi
+            fi
+        done
+	$pacmanCommand $packages
+        ;;
+    -S)
+        # Pesquisar pacote
+        pacman -Ss $packages
+        ;;
+    -R)
+        # Remover pacote
+        sudo pacman -R $packages
+        ;;
+    -Rr)
+        # Remover pacote, dependencia e etc
+        sudo pacman -Rsn $packages
+        ;;
+    -Qi)
+        # Consultar informação sobre um pacote
+        pacman -Qi $packages
+        ;;
+    -Qn)
+        # Consultar lista sobre pacotes desnecessarios e suas dependencias
+        pacman -Qdt
+        ;;
+    -Qm)
+        # Ver mirros atuais
+        cat /etc/pacman.d/mirrorlist
+        ;;
+    -Ua)
+        # Atualizar AUR
+        yay -a -Syu
+        ;;
+    -Ia)
+        # Instalar pacote do AUR
+        yay -S $packages
+        ;;
+    -Sa)
+        # Pesquisar pacote no AUR
+        yay -a -Ss $packages
+        ;;
+    -Qa)
+        # Consultar pacotes instalados do AUR
+        pacman -Qm
+        ;;
+    -Uf)
+        # Atualizar Flatpak
+        flatpak update
+        ;;
+    -If)
+        # Instalar pacote Flatpak
+        flatpak install flathub $packages
+        ;;
+    -Sf)
+        # Pesquisar por pacote Flatpak
+        flatpak search $packages
+        ;;
+    -Rf)
+        # Remover pacote Flatpak
+        flatpak uninstall $packages
+        ;;
+    -Qf)
+        # Consultar pacotes instalados do Flatpak
+        flatpak list
+        ;;
+    -Qfi)
+        # Consultar informação sobre pacote Flatpak
+        flatpak info $packages
+        ;;
+    --help)
+        # help
+        echo " ########## PACMAN ########## "
+        echo -e "akp -U:  Atualiza sistema (\033[1;32mU\033[0mpdate system)"
+        echo -e "akp -Ud: Atualizar distro (\033[1;32mU\033[0mpdate \033[1;32mD\033[0mistro (\033[1;32mArch\033[0m, \033[1;32maur\033[0m and \033[1;32mflatpak\033[0m repo))"
+	echo -e "akp -Um: Atualizar mirros (\033[1;32mU\033[0mpdate \033[1;32mM\033[0mirros)"
+        echo -e "akp -I:  Instalar pacote (\033[1;32mI\033[0mnstall package)"
+        echo -e "akp -S:  Pesquisar pacote (\033[1;32mS\033[0mearch packge)"
+        echo -e "akp -R:  Remover pacote (\033[1;32mR\033[0memove package)"
+        echo -e "akp -Rr: Remover pacote, dependencia e etc (\033[1;32mR\033[0memove package, dependency, etc)"
+        echo -e "akp -Qi: Consultar informação sobre um pacote (\033[1;32mQ\033[0muery package \033[1;32mI\033[0mnformation)"
+        echo -e "akp -Qn: Consultar lista sobre pacotes desnecessarios e suas dependencias (\033[1;32mQ\033[0muery list of \033[1;32mN\033[0meedless packages and dependencies)"
+        echo -e "akp -Qm: Consultar os mirros atuais (\033[1;32mQ\033[0muery current \033[1;32mM\033[0mirrors)"
+        echo " "
+	echo " ########## YAY ########## "
+        echo -e "akp -Ua: Atualizar AUR (\033[1;32mU\033[0mpdate \033[1;32mA\033[0mUR)"
+        echo -e "akp -Ia: Instalar pacote do AUR (\033[1;32mI\033[0mnstall \033[1;32mA\033[0mUR package)"
+        echo -e "akp -Sa: Pesquisar pacote do AUR (\033[1;32mS\033[0mearch package in \033[1;32mA\033[0mUR repo)"
+        echo -e "akp -Qa: Consultar pacotes instalados do AUR (\033[1;32mQ\033[0muery packages from the \033[1;32mA\033[0mUR repository)"
+        echo " "
+	echo " ########## FLATPAK ########## "
+        echo -e "akp -Uf: Atualizar Flatpak (\033[1;32mF\033[0mlatpak \033[1;32mU\033[0mpdate)"
+        echo -e "akp -If: Instalar pacote Flatpak (\033[1;32mI\033[0mnstall \033[1;32mF\033[0mlatpak package)"
+        echo -e "akp -Sf: Pesquisar por pacote Flatpak (\033[1;32mS\033[0mearch \033[1;32mF\033[0mlatpak package)"
+        echo -e "akp -Rf: Remover pacote Flatpak (\033[1;32mR\033[0memove \033[1;32mF\033[0mlatpak package)"
+        echo -e "akp -Qf: Consultar pacotes instalados do Flatpak (\033[1;32mQ\033[0muery packages from the \033[1;32mF\033[0mlatpak repository)"
+        echo -e "akp -Qfi: Consultar informação sobre pacote Flatpak (\033[1;32mQ\033[0muery \033[1;32mF\033[0mlatpak \033[1;32mI\033[0mnformation package)"
+        ;;        
+    *)
+        echo "Comando akp não reconhecido."
+        exit 1
+        ;;
+esac
