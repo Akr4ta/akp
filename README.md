@@ -1,2 +1,2 @@
 # akp
-A package manager wrapper for pacman, yay and flatpak
+A wrapper for pacman, yay and flatpak
