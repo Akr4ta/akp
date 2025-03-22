@@ -2,7 +2,7 @@
 
 # Check if the command is not empty
 if [ -z "$1" ]; then
-    echo "Erro: Nenhum alvo selecionado."
+    echo "Error: No target selected"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ case "$1" in
 
         # Check if at least one package was provided
         if [ -z "$2" ]; then
-            echo "Erro: Forneça pelo menos um pacote para instalar."
+            echo "Error: Please provide at least one target"
             exit 1
         fi
         
@@ -46,13 +46,13 @@ case "$1" in
             if [ "$pkg" != "-I" ]; then
                 optionalDeps=$(get_optional_deps "$pkg")
                 if [ -n "$optionalDeps" ]; then
-                    echo -e "O pacote \033[0;32m$pkg\033[0m possui as seguintes dependências opcionais:"
+                    echo -e "The \033[0;32m$pkg\033[0m package has the following optional dependencies:"
                     
                     # Add " :: " to the beginning of each line
                     echo "$optionalDeps" | sed 's/^/ ::/'
 
                     # Ask the user which optional dependencies they want to install
-                    echo -e "Deseja instalar alguma(s) das dependências opcionais para \033[0;32m$pkg\033[0m? (Digite os nomes separados por espaços): " 
+                    echo -e "Do you want to install any of the optional dependencies for \033[0;32m$pkg\033[0m? (Enter the names separated by spaces): " 
                     read -p "" selectedOptionalDeps
                     echo " "
 
@@ -133,33 +133,33 @@ case "$1" in
     --help)
         # Help
         echo " ########## PACMAN ########## "
-        echo -e "akp -U:  Atualizar sistema (\033[1;32mU\033[0mpdate system)"
-        echo -e "akp -Ud: Atualizar distro (\033[1;32mU\033[0mpdate \033[1;32mD\033[0mistro (\033[1;32mArch\033[0m, \033[1;32maur\033[0m and \033[1;32mflatpak\033[0m repo))"
-	echo -e "akp -Um: Atualizar mirrors com reflector (\033[1;32mU\033[0mpdate \033[1;32mM\033[0mirros)"
-        echo -e "akp -I:  Instalar pacote (\033[1;32mI\033[0mnstall package)"
-        echo -e "akp -S:  Pesquisar pacote (\033[1;32mS\033[0mearch packge)"
-        echo -e "akp -R:  Remover pacote (\033[1;32mR\033[0memove package)"
-        echo -e "akp -Rr: Remover pacote, dependencia e etc (\033[1;32mR\033[0memove package, dependency, etc)"
-        echo -e "akp -Qi: Consultar informação sobre um pacote (\033[1;32mQ\033[0muery package \033[1;32mI\033[0mnformation)"
-        echo -e "akp -Qn: Consultar lista sobre pacotes desnecessarios e suas dependencias (\033[1;32mQ\033[0muery list of \033[1;32mN\033[0meedless packages and dependencies)"
-        echo -e "akp -Qm: Consultar os mirrors atuais (\033[1;32mQ\033[0muery current \033[1;32mM\033[0mirrors)"
+        echo -e "akp -U:  \033[1;32mU\033[0mpdate system"
+        echo -e "akp -Ud: \033[1;32mU\033[0mpdate \033[1;32mD\033[0mistro (\033[1;32mArch\033[0m, \033[1;32maur\033[0m and \033[1;32mflatpak\033[0m repo)"
+	echo -e "akp -Um: \033[1;32mU\033[0mpdate \033[1;32mM\033[0mirros (e.g. akp -Um Brazil,Mexico,Canada)"
+        echo -e "akp -I:  \033[1;32mI\033[0mnstall package"
+        echo -e "akp -S:  \033[1;32mS\033[0mearch packge"
+        echo -e "akp -R:  \033[1;32mR\033[0memove package"
+        echo -e "akp -Rr: \033[1;32mR\033[0memove package, dependency, etc"
+        echo -e "akp -Qi: \033[1;32mQ\033[0muery package \033[1;32mI\033[0mnformation)"
+        echo -e "akp -Qn: \033[1;32mQ\033[0muery list of \033[1;32mN\033[0meedless packages and dependencies"
+        echo -e "akp -Qm: \033[1;32mQ\033[0muery current \033[1;32mM\033[0mirrors"
         echo " "
 	echo " ########## YAY ########## "
-        echo -e "akp -Ua: Atualizar AUR (\033[1;32mU\033[0mpdate \033[1;32mA\033[0mUR)"
-        echo -e "akp -Ia: Instalar pacote do AUR (\033[1;32mI\033[0mnstall \033[1;32mA\033[0mUR package)"
-        echo -e "akp -Sa: Pesquisar pacote do AUR (\033[1;32mS\033[0mearch package in \033[1;32mA\033[0mUR repo)"
-        echo -e "akp -Qa: Consultar pacotes instalados do AUR (\033[1;32mQ\033[0muery packages from the \033[1;32mA\033[0mUR repository)"
+        echo -e "akp -Ua: \033[1;32mU\033[0mpdate \033[1;32mA\033[0mUR"
+        echo -e "akp -Ia: \033[1;32mI\033[0mnstall \033[1;32mA\033[0mUR package"
+        echo -e "akp -Sa: \033[1;32mS\033[0mearch package in \033[1;32mA\033[0mUR repo"
+        echo -e "akp -Qa: \033[1;32mQ\033[0muery packages from the \033[1;32mA\033[0mUR repository"
         echo " "
 	echo " ########## FLATPAK ########## "
-        echo -e "akp -Uf: Atualizar Flatpak (\033[1;32mF\033[0mlatpak \033[1;32mU\033[0mpdate)"
-        echo -e "akp -If: Instalar pacote Flatpak (\033[1;32mI\033[0mnstall \033[1;32mF\033[0mlatpak package)"
-        echo -e "akp -Sf: Pesquisar por pacote Flatpak (\033[1;32mS\033[0mearch \033[1;32mF\033[0mlatpak package)"
-        echo -e "akp -Rf: Remover pacote Flatpak (\033[1;32mR\033[0memove \033[1;32mF\033[0mlatpak package)"
-        echo -e "akp -Qf: Consultar pacotes instalados do Flatpak (\033[1;32mQ\033[0muery packages from the \033[1;32mF\033[0mlatpak repository)"
-        echo -e "akp -Qfi: Consultar informação sobre pacote Flatpak (\033[1;32mQ\033[0muery \033[1;32mF\033[0mlatpak \033[1;32mI\033[0mnformation package)"
+        echo -e "akp -Uf: \033[1;32mF\033[0mlatpak \033[1;32mU\033[0mpdate"
+        echo -e "akp -If: \033[1;32mI\033[0mnstall \033[1;32mF\033[0mlatpak package"
+        echo -e "akp -Sf: \033[1;32mS\033[0mearch \033[1;32mF\033[0mlatpak package"
+        echo -e "akp -Rf: \033[1;32mR\033[0memove \033[1;32mF\033[0mlatpak package"
+        echo -e "akp -Qf: \033[1;32mQ\033[0muery packages from the \033[1;32mF\033[0mlatpak repository"
+        echo -e "akp -Qfi: \033[1;32mQ\033[0muery \033[1;32mF\033[0mlatpak \033[1;32mI\033[0mnformation package"
         ;;        
     *)
-        echo "Comando akp não reconhecido."
+        echo "akp command not recognized"
         exit 1
         ;;
 esac
