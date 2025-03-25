@@ -35,7 +35,7 @@ case "$1" in
         # Defining pacman command
         pacmanCommand="sudo pacman -S"
        
-        # Function to get optional dependencies from Pacman.
+        # Function to get optional dependencies from Pacman
         get_optional_deps() {
             package="$1"
             pactree -so "$package" | grep "(optional)" | rev | cut -d " " -f 2- | rev | cut -c 4- | tr '─' ' ' | sed 's/^\([^:]*\):/\x1b[0;34m\1\x1b[0m:/'
