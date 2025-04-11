@@ -38,7 +38,7 @@ case "$1" in
         # Function to get optional dependencies from Pacman
         get_optional_deps() {
             package="$1"
-            pactree -so "$package" | grep "(optional)" | rev | cut -d " " -f 2- | rev | cut -c 4- | tr '─' ' ' | sed 's/^\([^:]*\):/\x1b[0;34m\1\x1b[0m:/'
+	    expac -S '%O' "$package" | sed 's/  /\n/g' | sed 's/^\([^:]*\):/ \x1b[0;34m\1\x1b[0m:/'
         }
 
          # Display optional dependencies
@@ -49,7 +49,7 @@ case "$1" in
                     echo -e "The \033[0;32m$pkg\033[0m package has the following optional dependencies:"
                     
                     # Add " :: " to the beginning of each line
-                    echo "$optionalDeps" | sed 's/^/ ::/'
+                    echo "$optionalDeps"
 
                     # Ask the user which optional dependencies they want to install
                     echo -e "Do you want to install any of the optional dependencies for \033[0;32m$pkg\033[0m? (Enter the names separated by spaces): " 
