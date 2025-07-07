@@ -16,7 +16,7 @@ case "$1" in
         sudo pacman -Syu
         ;;
     -Ud)
-        # Update distro (arch, aur and flatpak repositories)
+        # Update system with arch, aur and flatpak repositories)
         sudo pacman -Syu && echo "" && yay -a -Syu && echo "" && flatpak update
         ;;
     -Um)
@@ -132,31 +132,28 @@ case "$1" in
         ;;
     --help)
         # Help
-        echo " ########## PACMAN ########## "
-        echo -e "akp -U:  \033[1;32mU\033[0mpdate system"
-        echo -e "akp -Ud: \033[1;32mU\033[0mpdate \033[1;32mD\033[0mistro (\033[1;32mArch\033[0m, \033[1;32maur\033[0m and \033[1;32mflatpak\033[0m repo)"
-	echo -e "akp -Um: \033[1;32mU\033[0mpdate \033[1;32mM\033[0mirros (e.g. akp -Um Brazil,Mexico,Canada)"
-        echo -e "akp -I:  \033[1;32mI\033[0mnstall package"
-        echo -e "akp -S:  \033[1;32mS\033[0mearch package"
-        echo -e "akp -R:  \033[1;32mR\033[0memove package"
-        echo -e "akp -Rr: \033[1;32mR\033[0memove package, its dependencies and all the packages that depend on the target package"
-        echo -e "akp -Qi: \033[1;32mQ\033[0muery package \033[1;32mI\033[0mnformation"
-        echo -e "akp -Ln: \033[1;32mL\033[0mist \033[1;32mN\033[0meedless packages and dependencies"
-        echo -e "akp -Qm: \033[1;32mQ\033[0muery current \033[1;32mM\033[0mirrors"
+        echo -e "akp -U   : Update system"
+        echo -e "akp -Ud  : Update Distro (Arch, aur and flatpak repositories)"
+	    echo -e "akp -Um  : Update Mirros (e.g. akp -Um Brazil,Mexico,Canada)"
+        echo -e "akp -I   : \033[1;32mI\033[0mnstall package(s)"
+        echo -e "akp -S   : \033[1;32mS\033[0mearch package"
+        echo -e "akp -R   : \033[1;32mR\033[0memove package(s)"
+        echo -e "akp -Rr  : \033[1;32mR\033[0memove package(s), its dependencies and all the packages that depend on the target package(s)"
+        echo -e "akp -Qi  : \033[1;32mQ\033[0muery package \033[1;32mI\033[0mnformation"
+        echo -e "akp -Ln  : \033[1;32mL\033[0mist \033[1;32mN\033[0meedless packages and dependencies"
+        echo -e "akp -Qm  : \033[1;32mQ\033[0muery current \033[1;32mM\033[0mirrors"
         echo " "
-	echo " ########## AUR ########## "
-        echo -e "akp -Ua: \033[1;32mU\033[0mpdate \033[1;32mA\033[0mUR"
-        echo -e "akp -Ia: \033[1;32mI\033[0mnstall \033[1;32mA\033[0mUR package"
-        echo -e "akp -Sa: \033[1;32mS\033[0mearch package in \033[1;32mA\033[0mUR repo"
-        echo -e "akp -La: \033[1;32mL\033[0mist packages from the \033[1;32mA\033[0mUR repository"
+        echo -e "akp -Ua  : \033[1;32mU\033[0mpdate \033[1;32mA\033[0mUR"
+        echo -e "akp -Ia  : \033[1;32mI\033[0mnstall \033[1;32mA\033[0mUR package(s)"
+        echo -e "akp -Sa  : \033[1;32mS\033[0mearch package in \033[1;32mA\033[0mUR repository"
+        echo -e "akp -La  : \033[1;32mL\033[0mist packages from the \033[1;32mA\033[0mUR repository"
         echo " "
-	echo " ########## FLATPAK ########## "
-        echo -e "akp -Uf: \033[1;32mF\033[0mlatpak \033[1;32mU\033[0mpdate"
-        echo -e "akp -If: \033[1;32mI\033[0mnstall \033[1;32mF\033[0mlatpak package"
-        echo -e "akp -Sf: \033[1;32mS\033[0mearch \033[1;32mF\033[0mlatpak package"
-        echo -e "akp -Rf: \033[1;32mR\033[0memove \033[1;32mF\033[0mlatpak package"
-        echo -e "akp -Lf: \033[1;32mL\033[0mist packages from the \033[1;32mF\033[0mlatpak repository"
-        echo -e "akp -Qfi: \033[1;32mQ\033[0muery \033[1;32mF\033[0mlatpak package \033[1;32mI\033[0mnformation"
+	    echo -e "akp -Uf  : \033[1;32mF\033[0mlatpak \033[1;32mU\033[0mpdate"
+        echo -e "akp -If  : \033[1;32mI\033[0mnstall \033[1;32mF\033[0mlatpak package"
+        echo -e "akp -Sf  : \033[1;32mS\033[0mearch \033[1;32mF\033[0mlatpak package"
+        echo -e "akp -Rf  : \033[1;32mR\033[0memove \033[1;32mF\033[0mlatpak package"
+        echo -e "akp -Lf  : \033[1;32mL\033[0mist packages from the \033[1;32mF\033[0mlatpak repository"
+        echo -e "akp -Qfi : \033[1;32mQ\033[0muery \033[1;32mF\033[0mlatpak package \033[1;32mI\033[0mnformation"
         ;;        
     *)
         echo "akp command not recognized"
