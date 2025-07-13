@@ -12,148 +12,157 @@ packages="${@:2}"
 # Translate akp command to pacman, yay and flatpak equivalent command
 case "$1" in
     -U)
-        # Update system with arch repositories
+        # update arch
         sudo pacman -Syu
         ;;
     -Ud)
-        # Update system with arch, aur and flatpak repositories)
+        # update distro (arch, aur and flatpak repositories)
         sudo pacman -Syu && echo "" && yay -a -Syu && echo "" && flatpak update
         ;;
     -Um)
-	# Update mirrors
+	# update mirrors using reflector
 	sudo reflector --country $packages --protocol https --sort rate --save /etc/pacman.d/mirrorlist && sudo pacman -Syyu
 	;;
+    -S)
+        # search package
+        pacman -Ss $packages
+        ;;
     -I)
-        # Install package
+        # install package
 
-        # Check if at least one package was provided
+        # check if at least one package was provided
         if [ -z "$2" ]; then
             echo "Error: Please provide at least one target"
             exit 1
         fi
         
-        # Defining pacman command
+        # defining pacman command
         pacmanCommand="sudo pacman -S"
        
-        # Function to get optional dependencies from Pacman
+        # function to get optional dependencies from Pacman
         get_optional_deps() {
             package="$1"
 	    expac -S '%O' "$package" | sed 's/  /\n/g' | sed 's/^\([^:]*\):/ \x1b[0;34m\1\x1b[0m:/'
         }
 
-         # Display optional dependencies
+         # display optional dependencies
         for pkg in "$@"; do
             if [ "$pkg" != "-I" ]; then
                 optionalDeps=$(get_optional_deps "$pkg")
                 if [ -n "$optionalDeps" ]; then
                     echo -e "The \033[0;32m$pkg\033[0m package has the following optional dependencies:"
                     
-                    # Add " :: " to the beginning of each line
+                    # add " :: " to the beginning of each line
                     echo "$optionalDeps"
 
-                    # Ask the user which optional dependencies they want to install
+                    # ask the user which optional dependencies they want to install
                     echo -e "Do you want to install any of the optional dependencies for \033[0;32m$pkg\033[0m? (Enter the names separated by spaces): " 
                     read -p "" selectedOptionalDeps
                     echo " "
 
-		    # Add the main packages and the selected optional dependencies to the package list
+		    # add the main packages and the selected optional dependencies to the package list
                     packages="$packages $pkg $selectedOptionalDeps"
                 else
-                    # If there are no optional dependencies, add only the main package to the list
+                    # if there are no optional dependencies, add only the main package to the list
 		    packages="$packages $pkg"
                 fi
             fi
         done
 	$pacmanCommand $packages
-        ;;
-    -S)
-        # Search package
-        pacman -Ss $packages
-        ;;
+        ;; 
     -R)
-        # Remove package
+        # remove package(s)
         sudo pacman -R $packages
         ;;
     -Rr)
-        # Remove package, dependencies, etc...
+        # remove package(s), dependencies, etc...
         sudo pacman -Rsn $packages
         ;;
-    -Qi)
-        # Query information about a package
+    -Qli)
+        # query local package information
         pacman -Qi $packages
         ;;
+    -Qri)
+        # query remote package information
+        pacman -Si $packages
+        ;;
     -Ln)
-        # List needless packages and their dependencies
+        # list needless packages and their dependencies
         pacman -Qdt
         ;;
     -Qm)
-        # Query current mirrors
+        # query current mirrors
         cat /etc/pacman.d/mirrorlist
         ;;
     -Ua)
-        # Update aur
+        # update aur
         yay -a -Syu
-        ;;
-    -Ia)
-        # Install aur package
-        yay -S $packages
-        ;;
+        ;; 
     -Sa)
-        # Search aur package
+        # search aur package
         yay -a -Ss $packages
         ;;
+    -Ia)
+        # install aur package(s)
+        yay -a -S $packages
+        ;;
     -La)
-        # List installed packages from aur
+        # list installed aur packages
         pacman -Qm
         ;;
     -Uf)
-        # Update flatpak
+        # update flatpak
         flatpak update
-        ;;
-    -If)
-        # Install flatpak package
-        flatpak install flathub $packages
-        ;;
+        ;; 
     -Sf)
-        # Search flatpak package
+        # search flatpak package
         flatpak search $packages
         ;;
+    -If)
+        # install flatpak package(s)
+        flatpak install flathub $packages
+        ;;
     -Rf)
-        # Remove flatpak package
+        # remove flatpak package
         flatpak uninstall $packages
         ;;
     -Lf)
-        # List installed packages from flatpak
-        flatpak list
+        # list installed flatpak packages
+        echo "Applications" && flatpak list --app
+        echo " "
+        echo "Runtimes" && flatpak list --runtime
         ;;
     -Qfi)
-        # Query flatpak package information
+        # query flatpak package information
         flatpak info $packages
         ;;
     --help)
-        # Help
-        echo -e "akp -U   : Update system"
-        echo -e "akp -Ud  : Update Distro (Arch, aur and flatpak repositories)"
-	    echo -e "akp -Um  : Update Mirros (e.g. akp -Um Brazil,Mexico,Canada)"
-        echo -e "akp -I   : Install package(s)"
-        echo -e "akp -S   : Search package"
-        echo -e "akp -R   : Remove package(s)"
-        echo -e "akp -Rr  : Remove package(s), its dependencies and all the packages that depend on the target package(s)"
-        echo -e "akp -Qi  : Query package Information"
-        echo -e "akp -Ln  : List Needless packages and dependencies"
-        echo -e "akp -Qm  : Query current Mirrors"
+        # help
+        echo "akp [operation] <target(s)>"
+        echo " " 
+        echo "akp -U   : Update arch"
+        echo "akp -Ud  : Update Distro (arch, aur and flatpak repositories)"
+	    echo "akp -Um  : Update Mirros using reflector (e.g. akp -Um Brazil,Mexico,Canada)"
+        echo "akp -S   : Search package"
+        echo "akp -I   : Install package(s)"
+        echo "akp -R   : Remove package(s)"
+        echo "akp -Rr  : Remove package(s), its dependencies and all the packages that depend on the target package(s)"
+        echo "akp -Qli : Query Local package Information"
+        echo "akp -Qri : Query Remote package Information"
+        echo "akp -Ln  : List Needless packages and dependencies"
+        echo "akp -Qm  : Query current Mirrors"
         echo " "
-        echo -e "akp -Ua  : Update AUR"
-        echo -e "akp -Ia  : Install AUR package(s)"
-        echo -e "akp -Sa  : Search package in AUR repository"
-        echo -e "akp -La  : List packages from the AUR repository"
+        echo "akp -Ua  : Update AUR"
+        echo "akp -Sa  : Search AUR package"
+        echo "akp -Ia  : Install AUR package(s)" 
+        echo "akp -La  : List installed AUR packages"
         echo " "
-	    echo -e "akp -Uf  : Flatpak Update"
-        echo -e "akp -If  : Install Flatpak package(s)"
-        echo -e "akp -Sf  : Search Flatpak package"
-        echo -e "akp -Rf  : Remove Flatpak package(s)"
-        echo -e "akp -Lf  : List packages from the Flatpak repository"
-        echo -e "akp -Qfi : Query Flatpak package Information"
+	    echo "akp -Uf  : Update Flatpak"
+        echo "akp -Sf  : Search Flatpak package"
+        echo "akp -If  : Install Flatpak package(s)" 
+        echo "akp -Rf  : Remove Flatpak package(s)"
+        echo "akp -Lf  : List installed Flatpak packages"
+        echo "akp -Qfi : Query Flatpak package Information"
         ;;        
     *)
         echo "akp command not recognized"
