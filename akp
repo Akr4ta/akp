@@ -159,7 +159,7 @@ case "$1" in
         echo " "
 	    echo "akp -Uf  : Update Flatpak"
         echo "akp -Sf  : Search Flatpak package"
-        echo "akp -If  : Install Flatpak package(s)" 
+        echo "akp -If  : Install Flatpak package(s) from flathub" 
         echo "akp -Rf  : Remove Flatpak package(s)"
         echo "akp -Lf  : List installed Flatpak packages"
         echo "akp -Qfi : Query Flatpak package Information"
