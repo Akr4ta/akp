@@ -12,7 +12,6 @@ makedepends=(git)
 optdepends=('yay: for AUR support')
 source=("git+$url.git")
 sha256sums=('SKIP')
-install=$pkgname.install
 
 package() {
 	cd "$srcdir/$pkgname"
