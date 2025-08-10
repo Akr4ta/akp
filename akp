@@ -2,8 +2,8 @@
 
 # Check if the command is not empty
 if [ -z "$1" ]; then
-    echo "Error: No target selected"
-    exit 1
+	echo -e "\033[0;31merror:\033[0m no operation selected"
+    	exit 1
 fi
 
 # Creanting package list
@@ -15,28 +15,24 @@ case "$1" in
         # update arch
         sudo pacman -Syu
         ;;
-    -Ud)
+    -Uaf)
         # update distro (arch, aur and flatpak repositories)
-        sudo pacman -Syu && echo "" && yay -a -Syu && echo "" && flatpak update
+        echo -e "\033[0;34mArch repositories\033[0m" && sudo pacman -Syu && echo "" && echo -e "\033[0;36mAUR repository\033[0m" && yay -a -Syu && echo "" && echo -e "\033[0;33mFlathub repository\033[0m" && flatpak update
         ;;
-    -Um)
-	# update mirrors using reflector
-	sudo reflector --country $packages --protocol https --sort rate --save /etc/pacman.d/mirrorlist && sudo pacman -Syyu
-	;;
     -S)
         # search package
         pacman -Ss $packages
         ;;
     -I)
         # install package
-
-        # check if at least one package was provided
+	
+	# check if at least one package was provided
         if [ -z "$2" ]; then
-            echo "Error: Please provide at least one target"
+            echo -e "\033[0;31merror:\033[0m please provide at least one target"
             exit 1
         fi
         
-        # defining pacman command
+	# defining pacman command
         pacmanCommand="sudo pacman -S"
        
         # function to get optional dependencies from Pacman
@@ -90,11 +86,7 @@ case "$1" in
         # list needless packages and their dependencies
         pacman -Qdt
         ;;
-    -Qm)
-        # query current mirrors
-        cat /etc/pacman.d/mirrorlist
-        ;;
-    -Ua)
+   -Ua)
         # update aur
         yay -a -Syu
         ;; 
@@ -128,9 +120,9 @@ case "$1" in
         ;;
     -Lf)
         # list installed flatpak packages
-        echo "Applications" && flatpak list --app
+        echo -e "\033[0;33mApplications\033[0m" && flatpak list --app
         echo " "
-        echo "Runtimes" && flatpak list --runtime
+        echo -e "\033[0;33mRuntimes\033[0m" && flatpak list --runtime
         ;;
     -Qfi)
         # query flatpak package information
@@ -141,23 +133,21 @@ case "$1" in
         echo "akp [operation] <target(s)>"
         echo " " 
         echo "akp -U   : Update arch"
-        echo "akp -Ud  : Update Distro (arch, aur and flatpak repositories)"
-	    echo "akp -Um  : Update Mirros using reflector (e.g. akp -Um Brazil,Mexico,Canada)"
-        echo "akp -S   : Search package"
+        echo "akp -Uaf : Update arch, aur and flatpak repositories"
+	echo "akp -S   : Search package"
         echo "akp -I   : Install package(s)"
         echo "akp -R   : Remove package(s)"
         echo "akp -Rr  : Remove package(s), its dependencies and all the packages that depend on the target package(s)"
         echo "akp -Qli : Query Local package Information"
         echo "akp -Qri : Query Remote package Information"
         echo "akp -Ln  : List Needless packages and dependencies"
-        echo "akp -Qm  : Query current Mirrors"
         echo " "
         echo "akp -Ua  : Update AUR"
         echo "akp -Sa  : Search AUR package"
         echo "akp -Ia  : Install AUR package(s)" 
         echo "akp -La  : List installed AUR packages"
         echo " "
-	    echo "akp -Uf  : Update Flatpak"
+	echo "akp -Uf  : Update Flatpak"
         echo "akp -Sf  : Search Flatpak package"
         echo "akp -If  : Install Flatpak package(s) from flathub" 
         echo "akp -Rf  : Remove Flatpak package(s)"
@@ -165,7 +155,8 @@ case "$1" in
         echo "akp -Qfi : Query Flatpak package Information"
         ;;        
     *)
-        echo "akp command not recognized"
+        #echo "akp command not recognized"
+	echo -e "\033[0;31merror:\033[0m akp command '$1' not recognized"
         exit 1
         ;;
 esac
