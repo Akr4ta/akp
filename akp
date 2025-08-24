@@ -11,21 +11,14 @@ packages="${@:2}"
 
 # Translate akp command to pacman, yay and flatpak equivalent command
 case "$1" in
-    -U)
-        # update arch
-        sudo pacman -Syu
-        ;;
+    -U) sudo pacman -Syu ;;
     -Uaf)
         # update distro (arch, aur and flatpak repositories)
-        echo -e "\033[0;34mArch repositories\033[0m" && sudo pacman -Syu && echo "" && echo -e "\033[0;36mAUR repository\033[0m" && yay -a -Syu && echo "" && echo -e "\033[0;33mFlathub repository\033[0m" && flatpak update
+        sudo echo -e "\033[0;34mArch repositories\033[0m" && sudo pacman -Syu && echo "" && echo -e "\033[0;36mAUR repository\033[0m" && yay -a -Syu && echo "" && echo -e "\033[0;33mFlathub repository\033[0m" && flatpak update
         ;;
-    -S)
-        # search package
-        pacman -Ss $packages
-        ;;
+    -S) pacman -Ss $packages ;;
     -I)
         # install package
-	
 	# check if at least one package was provided
         if [ -z "$2" ]; then
             echo -e "\033[0;31merror:\033[0m please provide at least one target"
@@ -66,94 +59,54 @@ case "$1" in
         done
 	$pacmanCommand $packages
         ;; 
-    -R)
-        # remove package(s)
-        sudo pacman -R $packages
-        ;;
-    -Rr)
-        # remove package(s), dependencies, etc...
-        sudo pacman -Rsn $packages
-        ;;
-    -Qli)
-        # query local package information
-        pacman -Qi $packages
-        ;;
-    -Qri)
-        # query remote package information
-        pacman -Si $packages
-        ;;
-    -Ln)
-        # list needless packages and their dependencies
-        pacman -Qdt
-        ;;
-   -Ua)
-        # update aur
-        yay -a -Syu
-        ;; 
-    -Sa)
-        # search aur package
-        yay -a -Ss $packages
-        ;;
-    -Ia)
-        # install aur package(s)
-        yay -a -S $packages
-        ;;
-    -La)
-        # list installed aur packages
-        pacman -Qm
-        ;;
-    -Uf)
-        # update flatpak
-        flatpak update
-        ;; 
-    -Sf)
-        # search flatpak package
-        flatpak search $packages
-        ;;
-    -If)
-        # install flatpak package(s)
-        flatpak install flathub $packages
-        ;;
-    -Rf)
-        # remove flatpak package
-        flatpak uninstall $packages
-        ;;
-    -Lf)
-        # list installed flatpak packages
-        echo -e "\033[0;33mApplications\033[0m" && flatpak list --app
+    -R) sudo pacman -R $packages ;;
+    -Rd) sudo pacman -Rsn $packages ;;
+    -Qi) pacman -Qi $packages ;;
+    -Qri) pacman -Si $packages ;;
+    -Qln) pacman -Qdt ;;
+    -Ua) yay -a -Syu ;; 
+    -Sa) yay -a -Ss $packages ;;
+    -Ia) yay -a -S $packages ;;
+    -Qai) yay -a -Si $packages ;;
+    -Qal) pacman -Qm ;;
+    -Uf) flatpak update ;; 
+    -Sf) flatpak search $packages ;;
+    -If) flatpak install flathub $packages ;;
+    -Rf) flatpak uninstall $packages ;;
+    -Qfi) flatpak info $packages ;;
+    -Qfl)
+	echo -e "\033[0;33mApplications\033[0m" && flatpak list --app
         echo " "
-        echo -e "\033[0;33mRuntimes\033[0m" && flatpak list --runtime
+        echo -e "\033[0;33mRuntimes\033[0m" && flatpak list --runtime 
         ;;
-    -Qfi)
-        # query flatpak package information
-        flatpak info $packages
-        ;;
-    --help)
+    --help|-h)
         # help
-        echo "akp [operation] <target(s)>"
         echo " " 
-        echo "akp -U   : Update arch"
-        echo "akp -Uaf : Update arch, aur and flatpak repositories"
-	echo "akp -S   : Search package"
-        echo "akp -I   : Install package(s)"
-        echo "akp -R   : Remove package(s)"
-        echo "akp -Rr  : Remove package(s), its dependencies and all the packages that depend on the target package(s)"
-        echo "akp -Qli : Query Local package Information"
-        echo "akp -Qri : Query Remote package Information"
-        echo "akp -Ln  : List Needless packages and dependencies"
+        echo "akp -U                  Update arch"
+        echo "akp -Uaf                Update arch, aur and flatpak repositories"
+	echo "akp -S   [package(s)]   Search package"
+	echo "akp -I   <package(s)>   Install package(s)"
+        echo "akp -R   <package(s)>   Remove package(s)"
+        echo "akp -Rd  <package(s)>   Remove package(s), its dependencies and all the packages that depend on the target package(s)"
+        echo "akp -Qi  [package(s)]   Query Local package Information"
+        echo "akp -Qri [package(s)]   Query package information in the arch Repository"
+        echo "akp -Qln                Query List Needless packages and dependencies"
         echo " "
-        echo "akp -Ua  : Update AUR"
-        echo "akp -Sa  : Search AUR package"
-        echo "akp -Ia  : Install AUR package(s)" 
-        echo "akp -La  : List installed AUR packages"
+        echo "akp -Ua                 Update AUR"
+        echo "akp -Sa  [package(s)]   Search AUR package"
+        echo "akp -Ia  <package(s)>   Install AUR package(s)"
+	echo "akp -Qai [package(s)]   Query package information in the AUR"
+        echo "akp -Qal                Query List installed AUR packages"
         echo " "
-	echo "akp -Uf  : Update Flatpak"
-        echo "akp -Sf  : Search Flatpak package"
-        echo "akp -If  : Install Flatpak package(s) from flathub" 
-        echo "akp -Rf  : Remove Flatpak package(s)"
-        echo "akp -Lf  : List installed Flatpak packages"
-        echo "akp -Qfi : Query Flatpak package Information"
-        ;;        
+	echo "akp -Uf                 Update Flatpak"
+        echo "akp -Sf  <package(s)>   Search Flatpak package"
+        echo "akp -If  <package(s)>   Install Flatpak package(s) from flathub" 
+        echo "akp -Rf  <package(s)>   Remove Flatpak package(s)"
+        echo "akp -Qfi <package(s)>   Query Flatpak package information"
+	echo "akp -Qfl                Query List installed Flatpak packages"
+	echo " "
+	echo "akp -h                  Shows this help page"
+	;;        
     *)
         #echo "akp command not recognized"
 	echo -e "\033[0;31merror:\033[0m akp command '$1' not recognized"
