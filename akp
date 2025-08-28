@@ -16,7 +16,52 @@ case "$1" in
         # update distro (arch, aur and flatpak repositories)
         sudo echo -e "\033[0;34mArch repositories\033[0m" && sudo pacman -Syu && echo "" && echo -e "\033[0;36mAUR repository\033[0m" && yay -a -Syu && echo "" && echo -e "\033[0;33mFlathub repository\033[0m" && flatpak update
         ;;
-    -S) pacman -Ss $packages ;;
+    -S)
+	width=$(tput cols) 
+	reserved=$(pacman -Ss $packages | awk -v term_width="$width" -F' +' '
+	NR % 2 == 1 {
+	    split($1, rp, "/")
+	    repo = rp[1]
+	    name_pkg = rp[2]
+	    version = $2
+
+	    group = "-"
+	    if ($3 ~ /^\(/) {
+		g=$3; gsub(/[()]/,"",g); group=g
+	    }
+	    next
+	}
+	NR % 2 == 0 {
+	    tmp_reserved = length(repo) + length(name_pkg) + length(version) + length(group) + 23
+	    if (reserved < tmp_reserved) reserved = tmp_reserved
+	}
+	END {
+	    print reserved
+	}')
+
+	pacman -Ss $packages | awk -v term_width="$width" -v reserved="$reserved" -F' +' ' 
+	BEGIN { print "PACOTE|DESCRIÇÃO|GRUPO|VERSÃO|REPO" } 
+	NR % 2 == 1 { 
+		split($1, rp, "/") 
+		repo = rp[1] 
+		name_pkg = rp[2] 
+		version = $2 
+		group = "-" 
+		if ($3 ~ /^\(/) { 
+			g=$3
+			gsub(/[()]/,"",g)
+			group=g } next 
+	} 
+	NR % 2 == 0 { 
+		desc = $0 
+		sub(/^[ \t]+/, "", desc)  	
+		diff_reserved = 56 - reserved
+		dw = term_width - reserved 
+		if (dw < 20) dw = 20
+		if (length(desc) > dw) desc = substr(desc,1,dw-3) "..."
+		print name_pkg "|" desc "|" group "|" version "|" repo
+	}' | column -s'|' -t 
+	;;
     -I)
         # install package
 	# check if at least one package was provided
