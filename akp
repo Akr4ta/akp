@@ -94,7 +94,7 @@ case "$1" in
 
          # display optional dependencies
         for pkg in "$@"; do
-            if [ "$pkg" != "-I" ]; then
+            if [ "$pkg" != "-Ip" ]; then
                 optionalDeps=$(get_optional_deps "$pkg")
                 if [ -n "$optionalDeps" ]; then
                     echo -e "The \033[0;32m$pkg\033[0m package has the following optional dependencies:"
