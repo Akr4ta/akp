@@ -1,7 +1,7 @@
 # Maintainer: Akrata
 
 pkgname=akp
-pkgver=20251016
+pkgver=20251018
 pkgrel=1
 pkgdesc="A package manager wrapper for pacman, yay and flatpak"
 arch=('any')
