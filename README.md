@@ -2,12 +2,13 @@
 A wrapper for pacman, yay and flatpak
 
 akp aims to:
-* Centralize the use of the three package managers
+* Centralize the use and commands of the three package managers
 * Offer the installation of optional dependencies when installing packages
 * Present Arch package search output in a table format
 * Command redesign
 
 # commands
+```
 akp -Ud                Update arch, aur and flatpak repositories
 akp -U                 Update Arch
 akp -S   [package(s)]  Search Arch package (installed packages will be printed in green)
@@ -31,3 +32,4 @@ akp -Qfi <package(s)>  Query Flatpak package information
 akp -Qfl               Query list installed Flatpak packages
  
 akp -h                  Shows help page
+```
