@@ -11,7 +11,7 @@ packages="${@:2}"
 
 # Translate akp command to pacman, yay and flatpak equivalent command
 case "$1" in 
-    -Ud)
+    -Us)
         # update distro (arch, aur and flatpak repositories)
         sudo echo " " && echo -e "\033[0;34mArch repositories\033[0m" && sudo pacman -Syu && echo "" && echo -e "\033[0;36mAUR repository\033[0m" && yay -a -Syu && echo "" && echo -e "\033[0;33mFlathub repository\033[0m" && flatpak update
         ;;
@@ -140,7 +140,7 @@ case "$1" in
     --help|-h)
         # help
         echo " " 
-        echo "akp -Ud                Update arch, aur and flatpak repositories"
+	echo "akp -Us                Update system (arch, aur and flatpak repositories)"
         echo "akp -U                 Update Arch"
 	echo -e "akp -S   [package(s)]  Search Arch package (installed packages will be printed in \033[1;32mgreen\033[0m)"
 	echo "akp -I   <package(s)>  Install Arch package(s)"
