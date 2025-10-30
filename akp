@@ -17,64 +17,93 @@ case "$1" in
         ;;
     -U) sudo pacman -Syu ;;
     -S)
-	# delimit the screen width
-	width=$(tput cols) 
-	# delimit output size
-	reserved=$(pacman -Ss $packages | awk -v term_width="$width" -F' +' '
-	NR % 2 == 1 {
-	    split($1, rp, "/")
-	    repo = rp[1]
-	    name_pkg = rp[2]
-	    
-	    version = $2
+    width=$(tput cols)
+    # collect pacman output once
+    pacout=$(pacman -Ss $packages)
 
-	    group = "-"
-	    if ($3 ~ /^\(/) {
-		g=$3; gsub(/[()]/,"",g); group=g
-	    }
-	    next
-	}
-	NR % 2 == 0 {
-	    tmp_reserved = length(repo) + length(name_pkg) + length(version) + 23
-	    if (reserved < tmp_reserved) reserved = tmp_reserved
-	}
-	END {
-	    print reserved
-	}')
-	
-	# 
-	pacman -Ss $packages | awk -v term_width="$width" -v reserved="$reserved" -F' +' ' 
-	BEGIN { GREEN="\033[1;32m"; RESET="\033[0m"
-		print "PACKAGE|DESCRIPTION|VERSION|REPO" } 
-	NR % 2 == 1 { 
-		split($1, rp, "/") 
-		repo = rp[1] 
-		name_pkg = rp[2]
-		found = 0
-		for (i=3; i<=4; i++) {
-		    if ($i ~ /\[/) found = 1
-		}
-		display_pkg = (found ? GREEN name_pkg RESET : name_pkg)
-		
-		version = $2 
-		
-		group = "-" 
-		if ($3 ~ /^\(/) { 
-			g=$3
-			gsub(/[()]/,"",g)
-			group=g } next 
-	} 
-	NR % 2 == 0 { 
-		desc = $0 
-		sub(/^[ \t]+/, "", desc)  	
-		diff_reserved = 56 - reserved
-		dw = term_width - reserved 
-		if (dw < 20) dw = 20
-		if (length(desc) > dw) desc = substr(desc,1,dw-3) "..."	
-		
-		print display_pkg "|" desc "|" version "|" repo
-	}' | column -s'|' -t 
-	;;
+    echo "$pacout" | awk -v term_width="$width" -F' +' '
+    BEGIN {
+        header_pkg = "PACKAGE"
+	#header_inst = "INST"
+        header_desc = "DESCRIPTION"
+        header_ver = "VERSION"
+        header_repo = "REPO"
+        rec = 0
+	GREEN = "\033[1;32m"
+        RESET = "\033[0m"
+    }
+
+    # handle odd lines (package line)
+    NR % 2 == 1 {
+        rec++
+        split($1, rp, "/")
+        repo[rec] = rp[1]
+        name_pkg[rec] = rp[2]
+        version[rec] = $2
+
+	#installed[rec] = " "
+	#for (i=3; i<=4; i++) {
+	#    if ($i ~ /\[/) installed[rec] = "✔ "
+	#}
+
+	# detecta se está instalado
+        installed[rec] = 0
+        for (i = 3; i <= NF; i++) {
+            if ($i ~ /\[/) installed[rec] = 1
+        }
+
+        # prepare a printable package name (no color here to keep widths exact)
+        pkg_print[rec] = name_pkg[rec]
+
+        # update maxima for pkg/version/repo considering header names too
+        if (length(pkg_print[rec]) > max_pkg) max_pkg = length(pkg_print[rec])
+        if (length(version[rec]) > max_ver) max_ver = length(version[rec])
+        if (length(repo[rec]) > max_repo) max_repo = length(repo[rec])
+
+        # ensure header length considered
+        if (length(header_pkg) > max_pkg) max_pkg = length(header_pkg)
+        if (length(header_ver) > max_ver) max_ver = length(header_ver)
+        if (length(header_repo) > max_repo) max_repo = length(header_repo)
+        next
+    }
+    # even lines: description
+    NR % 2 == 0 {
+        desc = $0
+        gsub(/^[ \t]+/, "", desc)
+        desc_arr[rec] = desc
+        if (length(desc) > max_desc) max_desc = length(desc)
+    }
+    END {
+	    # reserved space: max widths of pkg+ver+repo plus 6 single-space separators, 12 with INST
+        reserved = max_pkg + max_ver + max_repo + 6
+
+        dw = term_width - reserved
+        if (dw < 20) dw = 20
+
+        # print header
+        print header_pkg "|" header_desc "|" header_ver "|" header_repo
+
+        for (i=1;i<=rec;i++) {
+            d = desc_arr[i]
+            if (length(d) > dw) {
+                # leave room for "..."
+                if (dw > 3) {
+                    d = substr(d,1,dw-3) "..."
+                } else {
+                    d = substr(d,1,dw)
+                }
+            }
+            # ensure no trailing spaces
+            gsub(/[ \t\r\n]+$/, "", d)
+
+	    # adicionando cores
+            pkg_col = (installed[i] ? GREEN pkg_print[i] RESET : pkg_print[i])
+
+            print pkg_col "|" d "|" version[i] "|" repo[i]
+        }
+    }' | column -s'|' -t
+    ;;
+
     -I)
         # install package
 	# check if at least one package was provided
@@ -136,7 +165,7 @@ case "$1" in
 	echo -e "\033[0;33mApplications\033[0m" && flatpak list --app
         echo " "
         echo -e "\033[0;33mRuntimes\033[0m" && flatpak list --runtime 
-        ;;
+        ;; 
     --help|-h)
         # help
         echo " " 
