@@ -9,7 +9,7 @@ akp aims to:
 
 # commands
 ```
-akp -Ud                Update arch, aur and flatpak repositories
+akp -Us                Update system (arch, aur and flatpak repositories)
 akp -U                 Update Arch
 akp -S   [package(s)]  Search Arch package (installed packages will be printed in green)
 akp -I   <package(s)>  Install Arch package(s)
@@ -31,5 +31,5 @@ akp -Rf  <package(s)>  Remove Flatpak package(s)
 akp -Qfi <package(s)>  Query Flatpak package information
 akp -Qfl               Query list installed Flatpak packages
  
-akp -h                  Shows help page
+akp -h                  Shows this help page
 ```
