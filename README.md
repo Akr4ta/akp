@@ -7,7 +7,13 @@ akp aims to:
 * Present Arch package search output in a table format
 * Command redesign
 
-# commands
+# Offer the installation of optional dependencies when installing packages
+<img src="https://github.com/Akr4ta/akp/blob/main/images/akp-I.png" alt="e.g image">
+
+# Present Arch package search output in a table format
+<img src="https://github.com/Akr4ta/akp/blob/main/images/akp-S.png" alt="e.g image">
+
+# Command redesign
 ```
 akp -Us                Update system (arch, aur and flatpak repositories)
 akp -U                 Update Arch
