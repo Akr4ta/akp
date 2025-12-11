@@ -11,12 +11,7 @@ packages="${@:2}"
 
 # Translate akp command to pacman, yay and flatpak equivalent command
 case "$1" in 
-    -Us)
-        # update distro (arch, aur and flatpak repositories)
-        sudo echo " " && echo -e "\033[0;34mArch repositories\033[0m" && sudo pacman -Syu && echo "" && echo -e "\033[0;36mAUR repository\033[0m" && yay -a -Syu && echo "" && echo -e "\033[0;33mFlathub repository\033[0m" && flatpak update
-        ;;
-    -U) sudo pacman -Syu ;;
-    -S)
+   -S)
     width=$(tput cols)
     # collect pacman output once
     pacout=$(pacman -Ss $packages)
@@ -103,7 +98,6 @@ case "$1" in
         }
     }' | column -s'|' -t
     ;;
-
     -I)
         # install package
 	# check if at least one package was provided
@@ -146,10 +140,15 @@ case "$1" in
         done
 	$pacmanCommand $packages
         ;; 
+    -Us)
+    # update distro (arch, aur and flatpak repositories)
+        sudo echo " " && echo -e "\033[0;34mArch repositories\033[0m" && sudo pacman -Syu && echo "" && echo -e "\033[0;36mAUR repository\033[0m" && yay -a -Syu && echo "" && echo -e "\033[0;33mFlathub repository\033[0m" && flatpak update
+        ;;
+    -U) sudo pacman -Syu ;;
     -R) sudo pacman -R $packages ;;
     -Rd) sudo pacman -Rsn $packages ;;
     -Qi) pacman -Qi $packages ;;
-    -Qri) pacman -Si $packages ;;
+    -Qir) pacman -Si $packages ;;
     #-Qpln) pacman -Qdt ;;
     -Ua) yay -a -Syu ;; 
     -Sa) yay -a -Ss $packages ;;
@@ -192,7 +191,7 @@ case "$1" in
         echo "akp -Qfi <package(s)>  Query Flatpak package information"
 	echo "akp -Qfl               Query list installed Flatpak packages"
 	echo " "
-	echo "akp -h                  Shows this help page"
+	echo "akp -h                 Shows this help page"
 	;;        
     *)
         #echo "akp command not recognized"
